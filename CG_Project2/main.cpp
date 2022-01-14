@@ -38,11 +38,11 @@
 
 
 
-class CGProject2
+class GGProject2
 {
 public:
-    CGProject2();
-    ~CGProject2();
+    GGProject2();
+    ~GGProject2();
 
     bool Init();
 
@@ -58,7 +58,14 @@ private:
     Camera* pGameCamera = NULL;
     BasicMesh* pBox = NULL;
     BasicMesh* pMesh1 = NULL;
-    BasicMesh* fZombie = new BasicMesh();
+    BasicMesh* pMesh2 = NULL;
+
+    //BasicMesh* Bed = NULL;
+    //BasicMesh* Table = NULL;
+    //BasicMesh* TV = NULL;
+    //BasicMesh* Cabinet = NULL;
+    //BasicMesh* Room = NULL;
+
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
@@ -67,7 +74,7 @@ private:
 };
 
 
-CGProject2::CGProject2()
+GGProject2::GGProject2()
 {
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
@@ -106,7 +113,7 @@ CGProject2::CGProject2()
 }
 
 
-CGProject2::~CGProject2()
+GGProject2::~GGProject2()
 {
     if (pGameCamera) {
         delete pGameCamera;
@@ -120,8 +127,8 @@ CGProject2::~CGProject2()
         delete pMesh1;
     }
 
-    if (fZombie) {
-        delete fZombie;
+    if (pMesh2) {
+        delete pMesh2;
     }
 
     if (pLightingTech) {
@@ -130,10 +137,10 @@ CGProject2::~CGProject2()
 }
 
 
-bool CGProject2::Init()
+bool GGProject2::Init()
 {
-    Vector3f CameraPos(0.0f, 0.0f, -1.0f);
-    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
+    Vector3f CameraPos(0.0f, 5.0f, -8.0f);
+    Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
@@ -144,11 +151,17 @@ bool CGProject2::Init()
         return false;
     }
 
+    pMesh1 = new BasicMesh();
 
-    if (!fZombie->LoadMesh("../Models/female-zombie/female-zombie.obj")) {
+    if (!pMesh1->LoadMesh("../Models/female-zombie/female-zombie.obj")) {
         return false;
     }
 
+    pMesh2 = new BasicMesh();
+
+    if (!pMesh2->LoadMesh("../Content/box.obj")) {
+        return false;
+    }
 
 
     pLightingTech = new LightingTechnique();
@@ -168,7 +181,7 @@ bool CGProject2::Init()
 
 bool Start = false;
 
-void CGProject2::RenderSceneCB()
+void GGProject2::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -251,9 +264,9 @@ void CGProject2::RenderSceneCB()
 
     pMesh1->Render();
 
-    WorldTrans& meshWorldTransform2 = fZombie->GetWorldTransform();
+    WorldTrans& meshWorldTransform2 = pMesh2->GetWorldTransform();
     //  meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
-    meshWorldTransform2.SetPosition(0.0f, 1.0f, 1.0f);
+    meshWorldTransform2.SetPosition(0.0f, 2.0f, 1.0f);
     World = meshWorldTransform2.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -266,12 +279,12 @@ void CGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(fZombie->GetMaterial());
+    pLightingTech->SetMaterial(pMesh2->GetMaterial());
 
     CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    fZombie->Render();
+    pMesh2->Render();
 
     glutPostRedisplay();
     glutSwapBuffers();
@@ -282,7 +295,7 @@ void CGProject2::RenderSceneCB()
 
 #define ANGLE_STEP 1.0f
 
-void CGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
+void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case ' ':
@@ -336,42 +349,42 @@ void CGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 }
 
 
-void CGProject2::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
+void GGProject2::SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
     pGameCamera->OnKeyboard(key);
 }
 
 
-void CGProject2::PassiveMouseCB(int x, int y)
+void GGProject2::PassiveMouseCB(int x, int y)
 {
     pGameCamera->OnMouse(x, y);
 }
 
 
-CGProject2* pCGProject2 = NULL;
+GGProject2* pGGProject2 = NULL;
 
 
 void RenderSceneCB()
 {
-    pCGProject2->RenderSceneCB();
+    pGGProject2->RenderSceneCB();
 }
 
 
 void KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
-    pCGProject2->KeyboardCB(key, mouse_x, mouse_y);
+    pGGProject2->KeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void SpecialKeyboardCB(int key, int mouse_x, int mouse_y)
 {
-    pCGProject2->SpecialKeyboardCB(key, mouse_x, mouse_y);
+    pGGProject2->SpecialKeyboardCB(key, mouse_x, mouse_y);
 }
 
 
 void PassiveMouseCB(int x, int y)
 {
-    pCGProject2->PassiveMouseCB(x, y);
+    pGGProject2->PassiveMouseCB(x, y);
 }
 
 
@@ -419,9 +432,9 @@ int main(int argc, char** argv)
 
     InitializeGlutCallbacks();
 
-    pCGProject2 = new CGProject2();
+    pGGProject2 = new GGProject2();
 
-    if (!pCGProject2->Init()) {
+    if (!pGGProject2->Init()) {
         return 1;
     }
 
