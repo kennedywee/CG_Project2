@@ -152,6 +152,8 @@ void Camera::OnKeyboard(unsigned char Key)
         printf("Speed changed to %f\n", m_speed);
         break;
     }
+
+    //printf("Key Pressed: %c\n", Key);
 }
 
 

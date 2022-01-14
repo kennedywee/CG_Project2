@@ -1,23 +1,3 @@
-/*
-
-        Copyright 2121 Etay Meiri
-
-    This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.
-
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.
-
-    You should have received a copy of the GNU General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-    Tutorial 23 - Spot Light
-*/
-
 #include <stdio.h>
 #include <string.h>
 
@@ -79,13 +59,15 @@ GGProject2::GGProject2()
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
 
+    
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
+    
 
     glEnable(GL_DEPTH_TEST);
 
-    float FOV = 45.0f;
+    float FOV = 90.0f;
     float zNear = 0.1f;
     float zFar = 100.0f;
 
@@ -139,8 +121,8 @@ GGProject2::~GGProject2()
 
 bool GGProject2::Init()
 {
-    Vector3f CameraPos(0.0f, 5.0f, -8.0f);
-    Vector3f CameraTarget(0.0f, -0.5f, 1.0f);
+    Vector3f CameraPos(0.0f, 2.0f, -8.0f);
+    Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
@@ -153,7 +135,7 @@ bool GGProject2::Init()
 
     pMesh1 = new BasicMesh();
 
-    if (!pMesh1->LoadMesh("../Models/female-zombie/female-zombie.obj")) {
+    if (!pMesh1->LoadMesh("../Content/box.obj")) {
         return false;
     }
 
@@ -346,6 +328,8 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
 
     pGameCamera->OnKeyboard(key);
+
+    //printf("Key Pressed: %c\n", key);
 }
 
 
