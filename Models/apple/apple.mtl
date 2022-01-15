@@ -1,0 +1,35 @@
+# Blender MTL File: 'apple.blend'
+# Material Count: 3
+
+newmtl Material.001
+Ns 174.617338
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.000000 0.000416
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\Material.001 Base Color.png
+
+newmtl Material.002
+Ns 61.734701
+Ka 1.000000 1.000000 1.000000
+Kd 0.152325 0.015793 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\Material.002 Base Color.png
+
+newmtl Material.004
+Ns 225.000000
+Ka 1.000000 1.000000 1.000000
+Kd 0.030265 0.173355 0.000000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd textures\\Material.004 Base Color.png

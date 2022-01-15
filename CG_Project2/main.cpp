@@ -36,12 +36,10 @@ private:
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
-    //BasicMesh* Table = NULL;
-    //BasicMesh* TV = NULL;
 
     BasicMesh* Room = NULL;
-    BasicMesh* Cabinet = NULL;
-    BasicMesh* Bed = NULL;
+    BasicMesh* Zombie = NULL;
+
 
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
@@ -102,12 +100,8 @@ GGProject2::~GGProject2()
         delete Room;
     }
 
-    if (Cabinet) {
-        delete Cabinet;
-    }
-
-    if (Bed) {
-        delete Bed;
+    if (Zombie) {
+        delete Zombie;
     }
 
     if (pLightingTech) {
@@ -125,27 +119,16 @@ bool GGProject2::Init()
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
     Room = new BasicMesh();
-
-    //if (!Room->LoadMesh("../Content/box_terrain.obj")) {
     if (!Room->LoadMesh("../Models/room/room v2.obj")) {
         return false;
     }
 
-    Cabinet = new BasicMesh();
-
-    if (!Cabinet->LoadMesh("../Models/cabinet/cabinet.obj")) {
+    Zombie = new BasicMesh();
+    if (!Zombie->LoadMesh("../Models/zombie/zombie.obj")) {
         return false;
     }
-
-    Bed = new BasicMesh();
-
-    if (!Bed->LoadMesh("../Models/bed/bed.obj")) {
-        return false;
-    }
-
 
     pLightingTech = new LightingTechnique();
-
     if (!pLightingTech->Init())
     {
         return false;
@@ -209,8 +192,8 @@ void GGProject2::RenderSceneCB()
 
     Room->Render();
 
-    WorldTrans& meshWorldTransform = Cabinet->GetWorldTransform();
-    meshWorldTransform.SetPosition(-8.5f, 0.0f, 3.5f);
+    WorldTrans& meshWorldTransform = Zombie->GetWorldTransform();
+    meshWorldTransform.SetPosition(-15.0f, 0.0f, 3.5f);
     meshWorldTransform.SetRotation(0.0f, -90.0f, 0.0f);
     meshWorldTransform.SetScale(3.0f, 3.0f, 3.0f);
    
@@ -226,38 +209,12 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(Cabinet->GetMaterial());
+    pLightingTech->SetMaterial(Zombie->GetMaterial());
 
     CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    Cabinet->Render();
-
-    WorldTrans& meshWorldTransform2 = Bed->GetWorldTransform();
-    meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
-
-    meshWorldTransform2.SetPosition(-2.0f, 0.0f, 14.5f);
-    meshWorldTransform2.SetRotation(0.0f, 180.0f, 0.0f);
-    meshWorldTransform2.SetScale(5.0f, 5.0f, 5.0f);
-
-    World = meshWorldTransform2.GetMatrix();
-    WVP = Projection * View * World;
-    pLightingTech->SetWVP(WVP);
-
-    pointLights[0].CalcLocalPosition(meshWorldTransform2);
-    pointLights[1].CalcLocalPosition(meshWorldTransform2);
-    pLightingTech->SetPointLights(2, pointLights);
-
-    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform2);
-    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
-    pLightingTech->SetSpotLights(2, spotLights);
-
-    pLightingTech->SetMaterial(Bed->GetMaterial());
-
-    CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
-    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
-
-    Bed->Render();
+    Zombie->Render();
 
     glutPostRedisplay();
     glutSwapBuffers();
