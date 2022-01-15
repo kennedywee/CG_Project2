@@ -36,17 +36,12 @@ private:
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
-    // BasicMesh* pBox = NULL;
-    BasicMesh* pMesh1 = NULL;
-    BasicMesh* pMesh2 = NULL;
-
-    //BasicMesh* Bed = NULL;
     //BasicMesh* Table = NULL;
     //BasicMesh* TV = NULL;
-    //BasicMesh* Cabinet = NULL;
-    //BasicMesh* Room = NULL;
 
     BasicMesh* Room = NULL;
+    BasicMesh* Cabinet = NULL;
+    BasicMesh* Bed = NULL;
 
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
@@ -77,13 +72,13 @@ GGProject2::GGProject2()
 
     pointLights[0].DiffuseIntensity = 1.0f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[0].Attenuation.Linear = 0.2f;
+    pointLights[0].Attenuation.Linear = 0.1f;
     pointLights[0].Attenuation.Exp = 0.0f;
 
     pointLights[1].DiffuseIntensity = 1.0f;
     pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[1].Attenuation.Linear = 0.0f;
-    pointLights[1].Attenuation.Exp = 0.2f;
+    pointLights[1].Attenuation.Linear = 0.1f;
+    pointLights[1].Attenuation.Exp = 0.0f;
 
     spotLights[0].DiffuseIntensity = 1.0f;
     spotLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -107,12 +102,12 @@ GGProject2::~GGProject2()
         delete Room;
     }
 
-    if (pMesh1) {
-        delete pMesh1;
+    if (Cabinet) {
+        delete Cabinet;
     }
 
-    if (pMesh2) {
-        delete pMesh2;
+    if (Bed) {
+        delete Bed;
     }
 
     if (pLightingTech) {
@@ -136,15 +131,15 @@ bool GGProject2::Init()
         return false;
     }
 
-    pMesh1 = new BasicMesh();
+    Cabinet = new BasicMesh();
 
-    if (!pMesh1->LoadMesh("../Content/box.obj")) {
+    if (!Cabinet->LoadMesh("../Models/cabinet/cabinet.obj")) {
         return false;
     }
 
-    pMesh2 = new BasicMesh();
+    Bed = new BasicMesh();
 
-    if (!pMesh2->LoadMesh("../Content/box.obj")) {
+    if (!Bed->LoadMesh("../Models/bed/bed.obj")) {
         return false;
     }
 
@@ -172,13 +167,6 @@ void GGProject2::RenderSceneCB()
 
     pGameCamera->OnRender();
 
-#ifdef _WIN64
-    float YRotationAngle = 0.1f;
-#else
-    float YRotationAngle = 1.0f;
-#endif
-    counter += 0.01f;
-
     WorldTrans& worldTransform = Room->GetWorldTransform();
 
     worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
@@ -192,14 +180,14 @@ void GGProject2::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
 
-    pointLights[0].WorldPosition.x = -5.0f;
-    pointLights[0].WorldPosition.y = 2;
-    pointLights[0].WorldPosition.z = 5.0f;
+    pointLights[0].WorldPosition.x = -9.0f;
+    pointLights[0].WorldPosition.y = 3;
+    pointLights[0].WorldPosition.z = 8.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
-    pointLights[1].WorldPosition.x = 5.0f;
-    pointLights[1].WorldPosition.y = 2;
-    pointLights[1].WorldPosition.z = 5.0f;
+    pointLights[1].WorldPosition.x = 6.0f;
+    pointLights[1].WorldPosition.y = 3;
+    pointLights[1].WorldPosition.z = 8.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
 
     pLightingTech->SetPointLights(2, pointLights);
@@ -221,16 +209,11 @@ void GGProject2::RenderSceneCB()
 
     Room->Render();
 
-    WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
-    if (Start) {
-        static float counter2 = 0.0f;
-        counter2 += 0.001;
-        meshWorldTransform.SetPosition(0.0f, -4.0f + abs(sinf(counter2) * 4), 0.0f);
-    }
-    else {
-        meshWorldTransform.SetPosition(0.0f, -4.0f, 0.0f);
-    }
-
+    WorldTrans& meshWorldTransform = Cabinet->GetWorldTransform();
+    meshWorldTransform.SetPosition(-8.5f, 0.0f, 3.5f);
+    meshWorldTransform.SetRotation(0.0f, -90.0f, 0.0f);
+    meshWorldTransform.SetScale(3.0f, 3.0f, 3.0f);
+   
     World = meshWorldTransform.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -243,16 +226,20 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(pMesh1->GetMaterial());
+    pLightingTech->SetMaterial(Cabinet->GetMaterial());
 
     CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    pMesh1->Render();
+    Cabinet->Render();
 
-    WorldTrans& meshWorldTransform2 = pMesh2->GetWorldTransform();
-    //  meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
-    meshWorldTransform2.SetPosition(0.0f, 2.0f, 5.0f);
+    WorldTrans& meshWorldTransform2 = Bed->GetWorldTransform();
+    meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
+
+    meshWorldTransform2.SetPosition(-2.0f, 0.0f, 14.5f);
+    meshWorldTransform2.SetRotation(0.0f, 180.0f, 0.0f);
+    meshWorldTransform2.SetScale(5.0f, 5.0f, 5.0f);
+
     World = meshWorldTransform2.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -265,12 +252,12 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(pMesh2->GetMaterial());
+    pLightingTech->SetMaterial(Bed->GetMaterial());
 
     CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    pMesh2->Render();
+    Bed->Render();
 
     glutPostRedisplay();
     glutSwapBuffers();
