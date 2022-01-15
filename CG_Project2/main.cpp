@@ -47,6 +47,10 @@ private:
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
     float counter = 0;
+
+    float appleRotateX = 0.0f;
+    float appleMoveY = 0.0f;
+
 };
 
 
@@ -202,12 +206,17 @@ void GGProject2::RenderSceneCB()
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
     Room->Render();
-
+    
     WorldTrans& meshWorldTransform = Zombie->GetWorldTransform();
-    meshWorldTransform.SetPosition(-15.0f, 0.0f, 3.5f);
     meshWorldTransform.SetRotation(0.0f, -90.0f, 0.0f);
     meshWorldTransform.SetScale(3.0f, 3.0f, 3.0f);
-   
+    if (startZombie) {
+        
+    }
+    else {
+        meshWorldTransform.SetPosition(-15.0f, 0.0f, 3.5f);
+    } 
+       
     World = meshWorldTransform.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -228,8 +237,16 @@ void GGProject2::RenderSceneCB()
     Zombie->Render();
 
     WorldTrans& meshWorldTransform2 = Apple->GetWorldTransform();
-    meshWorldTransform2.SetPosition(2.5f, 3.6f, 17.0f);
     meshWorldTransform2.SetScale(0.2f, 0.2f, 0.2f);
+    if (startApple) {
+        appleMoveY += 0.001;
+        meshWorldTransform2.SetPosition(2.5f, 3.6f + appleMoveY, 17.0f);
+        printf("appleMoveY value: %f\n", appleMoveY);
+    }
+    else {
+        meshWorldTransform2.SetPosition(2.5f, 3.6f, 17.0f);
+    }
+     
 
     World = meshWorldTransform2.GetMatrix();
     WVP = Projection * View * World;
@@ -264,11 +281,8 @@ void GGProject2::RenderSceneCB()
 void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
-    case '1':
+    case ' ':
         startApple = true;
-        break;
-    case '2':
-        startZombie = true;
         break;
     case 'q':
     case 27:    // escape key code
@@ -312,11 +326,12 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 
     }
 
-    printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
+    //printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
 
     pGameCamera->OnKeyboard(key);
 
-    //printf("Key Pressed: %c\n", key);
+    printf("Key Pressed: %c\n", key);
+    printf("Value of startApple: %d\n", startApple);
 }
 
 
