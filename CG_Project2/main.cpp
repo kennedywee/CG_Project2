@@ -36,7 +36,7 @@ private:
     GLuint WVPLocation;
     GLuint SamplerLocation;
     Camera* pGameCamera = NULL;
-    BasicMesh* pBox = NULL;
+    // BasicMesh* pBox = NULL;
     BasicMesh* pMesh1 = NULL;
     BasicMesh* pMesh2 = NULL;
 
@@ -45,6 +45,8 @@ private:
     //BasicMesh* TV = NULL;
     //BasicMesh* Cabinet = NULL;
     //BasicMesh* Room = NULL;
+
+    BasicMesh* Room = NULL;
 
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
@@ -59,36 +61,36 @@ GGProject2::GGProject2()
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
 
-    
+    /*
     glEnable(GL_CULL_FACE);
     glFrontFace(GL_CW);
     glCullFace(GL_BACK);
-    
+    */
 
     glEnable(GL_DEPTH_TEST);
 
     float FOV = 90.0f;
-    float zNear = 0.1f;
+    float zNear = 0.01f;
     float zFar = 100.0f;
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    pointLights[0].DiffuseIntensity = 0.5f;
-    pointLights[0].Color = Vector3f(1.0f, 1.0f, 0.0f);
+    pointLights[0].DiffuseIntensity = 1.0f;
+    pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
     pointLights[0].Attenuation.Linear = 0.2f;
     pointLights[0].Attenuation.Exp = 0.0f;
 
-    pointLights[1].DiffuseIntensity = 0.0f;
-    pointLights[1].Color = Vector3f(0.0f, 1.0f, 1.0f);
+    pointLights[1].DiffuseIntensity = 1.0f;
+    pointLights[1].Color = Vector3f(1.0f, 1.0f, 0.0f);
     pointLights[1].Attenuation.Linear = 0.0f;
     pointLights[1].Attenuation.Exp = 0.2f;
 
     spotLights[0].DiffuseIntensity = 1.0f;
     spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
     spotLights[0].Attenuation.Linear = 0.01f;
-    spotLights[0].Cutoff = 20.0f;
+    spotLights[0].Cutoff = 30.0f;
 
-    spotLights[1].DiffuseIntensity = 1.0f;
+    spotLights[1].DiffuseIntensity = 0.0f;
     spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
     spotLights[1].Attenuation.Linear = 0.01f;
     spotLights[1].Cutoff = 30.0f;
@@ -101,8 +103,8 @@ GGProject2::~GGProject2()
         delete pGameCamera;
     }
 
-    if (pBox) {
-        delete pBox;
+    if (Room) {
+        delete Room;
     }
 
     if (pMesh1) {
@@ -127,9 +129,10 @@ bool GGProject2::Init()
 
     pGameCamera = new Camera(WINDOW_WIDTH, WINDOW_HEIGHT, CameraPos, CameraTarget, CameraUp);
 
-    pBox = new BasicMesh();
+    Room = new BasicMesh();
 
-    if (!pBox->LoadMesh("../Content/box_terrain.obj")) {
+    //if (!Room->LoadMesh("../Content/box_terrain.obj")) {
+    if (!Room->LoadMesh("../Models/room/room v2.obj")) {
         return false;
     }
 
@@ -176,7 +179,7 @@ void GGProject2::RenderSceneCB()
 #endif
     counter += 0.01f;
 
-    WorldTrans& worldTransform = pBox->GetWorldTransform();
+    WorldTrans& worldTransform = Room->GetWorldTransform();
 
     worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
@@ -188,14 +191,14 @@ void GGProject2::RenderSceneCB()
     Matrix4f WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
 
-    pointLights[0].WorldPosition.x = -10.0f;
+    pointLights[0].WorldPosition.x = -5.0f;
     pointLights[0].WorldPosition.y = 2;
-    pointLights[0].WorldPosition.z = 0.0f;
+    pointLights[0].WorldPosition.z = 5.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
-    pointLights[1].WorldPosition.x = 10.0f;
-    pointLights[1].WorldPosition.y = sinf(counter) * 4 + 4;
-    pointLights[1].WorldPosition.z = 0.0f;
+    pointLights[1].WorldPosition.x = 5.0f;
+    pointLights[1].WorldPosition.y = 2;
+    pointLights[1].WorldPosition.z = 5.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
 
     pLightingTech->SetPointLights(2, pointLights);
@@ -210,12 +213,12 @@ void GGProject2::RenderSceneCB()
 
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(pBox->GetMaterial());
+    pLightingTech->SetMaterial(Room->GetMaterial());
 
     Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
 
-    pBox->Render();
+    Room->Render();
 
     WorldTrans& meshWorldTransform = pMesh1->GetWorldTransform();
     if (Start) {
@@ -248,7 +251,7 @@ void GGProject2::RenderSceneCB()
 
     WorldTrans& meshWorldTransform2 = pMesh2->GetWorldTransform();
     //  meshWorldTransform2.SetRotation(0.0f, -45.0f, 0.0f);
-    meshWorldTransform2.SetPosition(0.0f, 2.0f, 1.0f);
+    meshWorldTransform2.SetPosition(0.0f, 2.0f, 5.0f);
     World = meshWorldTransform2.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -400,12 +403,9 @@ int main(int argc, char** argv)
     int win = glutCreateWindow("Tutorial 23");
     printf("window id: %d\n", win);
 
-    char game_mode_string[64];
-    // Game mode string example: 2020x1080@32
-    // Enable the following three lines for full screen
-    // snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@32", WINDOW_WIDTH, WINDOW_HEIGHT);
-    // glutGameModeString(game_mode_string);
-    // glutEnterGameMode();
+    glutSetCursor(GLUT_CURSOR_NONE);
+    glutFullScreen();
+
 
     // Must be done after glut is initialized!
     GLenum res = glewInit();

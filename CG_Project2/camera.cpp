@@ -248,6 +248,7 @@ void Camera::Update()
 
     m_up = m_target.Cross(U);
     m_up.Normalize();
+
 }
 
 
