@@ -19,9 +19,11 @@
 #include "ogldev_world_transform.h"
 
 
-void WorldTrans::SetScale(float scale)
+void WorldTrans::SetScale(float x, float y, float z)
 {
-    m_scale = scale;
+    m_scale.x = x;
+    m_scale.y = y;
+    m_scale.z = z;
 }
 
 
@@ -58,7 +60,7 @@ void WorldTrans::Rotate(float x, float y, float z)
 Matrix4f WorldTrans::GetMatrix() const
 {
     Matrix4f Scale;
-    Scale.InitScaleTransform(m_scale, m_scale, m_scale);
+    Scale.InitScaleTransform(m_scale.x, m_scale.y, m_scale.z);
 
     Matrix4f Rotation;
     Rotation.InitRotateTransform(m_rotation.x, m_rotation.y, m_rotation.z);

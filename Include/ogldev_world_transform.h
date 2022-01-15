@@ -25,7 +25,7 @@ class WorldTrans {
  public:
     WorldTrans() {}
 
-    void SetScale(float scale);
+    void SetScale(float x, float y, float z);
     void SetRotation(float x, float y, float z);
     void SetRotation(const Vector3f& );
     void SetPosition(float x, float y, float z);
@@ -41,12 +41,12 @@ class WorldTrans {
     Matrix4f GetReversedTranslationMatrix() const;
     Matrix4f GetReversedRotationMatrix() const;
 
-    float GetScale() const { return m_scale; }
+    Vector3f GetScale() const { return m_scale; }
     Vector3f GetPos() const { return m_pos; }
     Vector3f GetRotation() const { return m_rotation; }
 
  private:
-    float    m_scale    = 1.0f;
+    Vector3f m_scale   = Vector3f(1.0f, 1.0f, 1.0f);
     Vector3f m_rotation = Vector3f(0.0f, 0.0f, 0.0f);
     Vector3f m_pos      = Vector3f(0.0f, 0.0f, 0.0f);
 };

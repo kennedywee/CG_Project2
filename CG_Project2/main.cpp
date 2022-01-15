@@ -184,6 +184,7 @@ void GGProject2::RenderSceneCB()
     worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
 
+
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
     Matrix4f Projection;
