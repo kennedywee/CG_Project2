@@ -39,6 +39,7 @@ private:
 
     BasicMesh* Room = NULL;
     BasicMesh* Zombie = NULL;
+    BasicMesh* Apple = NULL;
 
 
     PersProjInfo persProjInfo;
@@ -104,6 +105,10 @@ GGProject2::~GGProject2()
         delete Zombie;
     }
 
+    if (Apple) {
+        delete Apple;
+    }
+
     if (pLightingTech) {
         delete pLightingTech;
     }
@@ -128,6 +133,11 @@ bool GGProject2::Init()
         return false;
     }
 
+    Apple = new BasicMesh();
+    if (!Apple->LoadMesh("../Models/apple/apple.obj")) {
+        return false;
+    }
+
     pLightingTech = new LightingTechnique();
     if (!pLightingTech->Init())
     {
@@ -142,7 +152,8 @@ bool GGProject2::Init()
     return true;
 }
 
-bool Start = false;
+bool startZombie = false;
+bool startApple = false;
 
 void GGProject2::RenderSceneCB()
 {
@@ -216,6 +227,31 @@ void GGProject2::RenderSceneCB()
 
     Zombie->Render();
 
+    WorldTrans& meshWorldTransform2 = Apple->GetWorldTransform();
+    meshWorldTransform2.SetPosition(2.5f, 3.6f, 17.0f);
+    meshWorldTransform2.SetScale(0.2f, 0.2f, 0.2f);
+
+    World = meshWorldTransform2.GetMatrix();
+    WVP = Projection * View * World;
+    pLightingTech->SetWVP(WVP);
+
+    pointLights[0].CalcLocalPosition(meshWorldTransform2);
+    pointLights[1].CalcLocalPosition(meshWorldTransform2);
+    pLightingTech->SetPointLights(2, pointLights);
+
+    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform2);
+    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
+    pLightingTech->SetSpotLights(2, spotLights);
+
+    pLightingTech->SetMaterial(Apple->GetMaterial());
+
+    CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
+    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
+
+    Apple->Render();
+
+    
+
     glutPostRedisplay();
     glutSwapBuffers();
 }
@@ -228,8 +264,11 @@ void GGProject2::RenderSceneCB()
 void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
-    case ' ':
-        Start = true;
+    case '1':
+        startApple = true;
+        break;
+    case '2':
+        startZombie = true;
         break;
     case 'q':
     case 27:    // escape key code
