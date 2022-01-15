@@ -16,7 +16,8 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-
+bool startApple = false;
+bool startZombieGhost = false;
 
 class GGProject2
 {
@@ -38,19 +39,14 @@ private:
     Camera* pGameCamera = NULL;
 
     BasicMesh* Room = NULL;
-    BasicMesh* Zombie = NULL;
     BasicMesh* Apple = NULL;
-
+    BasicMesh* Zombie = NULL;
+    BasicMesh* Ghost = NULL;
 
     PersProjInfo persProjInfo;
     LightingTechnique* pLightingTech = NULL;
     PointLight pointLights[LightingTechnique::MAX_POINT_LIGHTS];
     SpotLight spotLights[LightingTechnique::MAX_SPOT_LIGHTS];
-    float counter = 0;
-
-    float appleRotateX = 0.0f;
-    float appleMoveY = 0.0f;
-
 };
 
 
@@ -73,14 +69,14 @@ GGProject2::GGProject2()
 
     persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
-    pointLights[0].DiffuseIntensity = 1.0f;
+    pointLights[0].DiffuseIntensity = 0.7f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[0].Attenuation.Linear = 0.1f;
+    pointLights[0].Attenuation.Linear = 0.2f;
     pointLights[0].Attenuation.Exp = 0.0f;
 
-    pointLights[1].DiffuseIntensity = 1.0f;
+    pointLights[1].DiffuseIntensity = 0.7f;
     pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
-    pointLights[1].Attenuation.Linear = 0.1f;
+    pointLights[1].Attenuation.Linear = 0.2f;
     pointLights[1].Attenuation.Exp = 0.0f;
 
     spotLights[0].DiffuseIntensity = 1.0f;
@@ -105,12 +101,16 @@ GGProject2::~GGProject2()
         delete Room;
     }
 
+    if (Apple) {
+        delete Apple;
+    }
+
     if (Zombie) {
         delete Zombie;
     }
 
-    if (Apple) {
-        delete Apple;
+    if (Ghost) {
+        delete Ghost;
     }
 
     if (pLightingTech) {
@@ -132,13 +132,18 @@ bool GGProject2::Init()
         return false;
     }
 
+    Apple = new BasicMesh();
+    if (!Apple->LoadMesh("../Models/apple/apple.obj")) {
+        return false;
+    }
+
     Zombie = new BasicMesh();
     if (!Zombie->LoadMesh("../Models/zombie/zombie.obj")) {
         return false;
     }
 
-    Apple = new BasicMesh();
-    if (!Apple->LoadMesh("../Models/apple/apple.obj")) {
+    Ghost = new BasicMesh();
+    if (!Ghost->LoadMesh("../Models/ghost/ghost.obj")) {
         return false;
     }
 
@@ -156,9 +161,6 @@ bool GGProject2::Init()
     return true;
 }
 
-bool startZombie = false;
-bool startApple = false;
-
 void GGProject2::RenderSceneCB()
 {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -166,10 +168,8 @@ void GGProject2::RenderSceneCB()
     pGameCamera->OnRender();
 
     WorldTrans& worldTransform = Room->GetWorldTransform();
-
     worldTransform.SetRotation(0.0f, 0.0f, 0.0f);
     worldTransform.SetPosition(0.0f, 0.0f, 10.0f);
-
 
     Matrix4f World = worldTransform.GetMatrix();
     Matrix4f View = pGameCamera->GetMatrix();
@@ -183,9 +183,9 @@ void GGProject2::RenderSceneCB()
     pointLights[0].WorldPosition.z = 8.0f;
     pointLights[0].CalcLocalPosition(worldTransform);
 
-    pointLights[1].WorldPosition.x = 6.0f;
+    pointLights[1].WorldPosition.x = 15.0f;
     pointLights[1].WorldPosition.y = 3;
-    pointLights[1].WorldPosition.z = 8.0f;
+    pointLights[1].WorldPosition.z = 2.0f;
     pointLights[1].CalcLocalPosition(worldTransform);
 
     pLightingTech->SetPointLights(2, pointLights);
@@ -201,22 +201,29 @@ void GGProject2::RenderSceneCB()
     pLightingTech->SetSpotLights(2, spotLights);
 
     pLightingTech->SetMaterial(Room->GetMaterial());
-
     Vector3f CameraLocalPos3f = worldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
-
     Room->Render();
-    
-    WorldTrans& meshWorldTransform = Zombie->GetWorldTransform();
-    meshWorldTransform.SetRotation(0.0f, -90.0f, 0.0f);
-    meshWorldTransform.SetScale(3.0f, 3.0f, 3.0f);
-    if (startZombie) {
-        
+
+    WorldTrans& meshWorldTransform = Apple->GetWorldTransform();
+    meshWorldTransform.SetScale(0.2f, 0.2f, 0.2f);
+    if (startApple) {
+        static float moveY = 0.0f;
+        static float stopY = 3.0f;
+        moveY += 0.005;
+
+        if (moveY < stopY) {
+            meshWorldTransform.SetPosition(2.5f, 3.6f + moveY, 17.0f);
+        }
+        else if (moveY > stopY) {
+            meshWorldTransform.SetPosition(2.5f, 3.6f + stopY, 17.0f);
+            meshWorldTransform.Rotate(0.0f, 1.0f, 0.0f);
+        }
     }
     else {
-        meshWorldTransform.SetPosition(-15.0f, 0.0f, 3.5f);
-    } 
-       
+        meshWorldTransform.SetPosition(2.5f, 3.6f, 17.0f);
+    }
+
     World = meshWorldTransform.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -229,25 +236,30 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(Zombie->GetMaterial());
-
+    pLightingTech->SetMaterial(Apple->GetMaterial());
     CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
+    Apple->Render();
+    
+    WorldTrans& meshWorldTransform2 = Zombie->GetWorldTransform();
+    meshWorldTransform2.SetRotation(0.0f, -90.0f, 0.0f);
+    meshWorldTransform2.SetScale(3.5f, 3.5f, 3.5f);
+    if (startZombieGhost) {
+        static float moveX = 0.0f;
+        static float stopX = 10.0f;
+        moveX += 0.01;
 
-    Zombie->Render();
-
-    WorldTrans& meshWorldTransform2 = Apple->GetWorldTransform();
-    meshWorldTransform2.SetScale(0.2f, 0.2f, 0.2f);
-    if (startApple) {
-        appleMoveY += 0.001;
-        meshWorldTransform2.SetPosition(2.5f, 3.6f + appleMoveY, 17.0f);
-        printf("appleMoveY value: %f\n", appleMoveY);
+        if (moveX < stopX) {
+            meshWorldTransform2.SetPosition(-10.0f + moveX, 0.0f, 4.0f);
+        }
+        else if (moveX > stopX) {
+            meshWorldTransform2.SetPosition(-10.0f + stopX, 0.0f, 4.0f);
+        }
     }
     else {
-        meshWorldTransform2.SetPosition(2.5f, 3.6f, 17.0f);
-    }
-     
-
+        meshWorldTransform2.SetPosition(-10.5f, 0.0f, 4.0f);
+    } 
+       
     World = meshWorldTransform2.GetMatrix();
     WVP = Projection * View * World;
     pLightingTech->SetWVP(WVP);
@@ -260,14 +272,42 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(Apple->GetMaterial());
-
+    pLightingTech->SetMaterial(Zombie->GetMaterial());
     CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
+    Zombie->Render();
 
-    Apple->Render();
+    WorldTrans& meshWorldTransform3 = Ghost->GetWorldTransform();
+    meshWorldTransform3.SetRotation(0.0f, 90.0f, 0.0f);
+    meshWorldTransform3.SetScale(4.0f, 4.0f, 4.0f);
+    if (startZombieGhost) {
+        static float moveX = 0.0f;
+        static float stopX = 20.0f;
+        moveX += 0.01;
 
-    
+        meshWorldTransform3.SetPosition(30.0f - moveX, 0.0f, 2.0f);
+    }
+    else {
+        meshWorldTransform3.SetPosition(30.0f, 0.0f, 2.0f);
+    }
+
+    World = meshWorldTransform3.GetMatrix();
+    WVP = Projection * View * World;
+    pLightingTech->SetWVP(WVP);
+
+    pointLights[0].CalcLocalPosition(meshWorldTransform3);
+    pointLights[1].CalcLocalPosition(meshWorldTransform3);
+    pLightingTech->SetPointLights(2, pointLights);
+
+    spotLights[0].CalcLocalDirectionAndPosition(meshWorldTransform3);
+    spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform3);
+    pLightingTech->SetSpotLights(2, spotLights);
+
+    pLightingTech->SetMaterial(Ghost->GetMaterial());
+    CameraLocalPos3f = meshWorldTransform3.WorldPosToLocalPos(pGameCamera->GetPos());
+    pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
+    Ghost->Render();
+
 
     glutPostRedisplay();
     glutSwapBuffers();
@@ -281,9 +321,14 @@ void GGProject2::RenderSceneCB()
 void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
-    case ' ':
+    case '1':
         startApple = true;
         break;
+
+    case '2':
+        startZombieGhost = true;
+        break;
+
     case 'q':
     case 27:    // escape key code
         exit(0);
