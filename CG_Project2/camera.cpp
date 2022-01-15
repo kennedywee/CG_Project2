@@ -21,7 +21,7 @@
 #include "camera.h"
 
 static int MARGIN = 10;
-static float EDGE_STEP = 1.0f;
+static float EDGE_STEP = 0.8f;
 
 Camera::Camera(int WindowWidth, int WindowHeight)
 {
@@ -139,16 +139,20 @@ void Camera::OnKeyboard(unsigned char Key)
         m_pos.y -= m_speed;
         break;
 
-    case '+':
-        m_speed += 0.1f;
+    case '=':
+        // m_speed += 0.1f;
+        m_speed = 0.2f;
         printf("Speed changed to %f\n", m_speed);
         break;
 
     case '-':
-        m_speed -= 0.1f;
+        m_speed = 0.1f;
+        
+        /*
         if (m_speed < 0.1f) {
             m_speed = 0.1f;
         }
+        */
         printf("Speed changed to %f\n", m_speed);
         break;
     }
