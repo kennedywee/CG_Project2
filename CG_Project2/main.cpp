@@ -13,8 +13,8 @@
 #include "lighting_technique.h"
 #include "ogldev_engine_common.h"
 
-#define WINDOW_WIDTH  1280
-#define WINDOW_HEIGHT 720
+#define WINDOW_WIDTH  1920
+#define WINDOW_HEIGHT 1080
 
 
 
@@ -81,12 +81,12 @@ GGProject2::GGProject2()
     pointLights[0].Attenuation.Exp = 0.0f;
 
     pointLights[1].DiffuseIntensity = 1.0f;
-    pointLights[1].Color = Vector3f(1.0f, 1.0f, 0.0f);
+    pointLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
     pointLights[1].Attenuation.Linear = 0.0f;
     pointLights[1].Attenuation.Exp = 0.2f;
 
     spotLights[0].DiffuseIntensity = 1.0f;
-    spotLights[0].Color = Vector3f(1.0f, 0.0f, 0.0f);
+    spotLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
     spotLights[0].Attenuation.Linear = 0.01f;
     spotLights[0].Cutoff = 30.0f;
 
@@ -123,7 +123,7 @@ GGProject2::~GGProject2()
 
 bool GGProject2::Init()
 {
-    Vector3f CameraPos(0.0f, 2.0f, -8.0f);
+    Vector3f CameraPos(21.0f, 5.0f, 2.0f);
     Vector3f CameraTarget(0.0f, 0.0f, 1.0f);
     Vector3f CameraUp(0.0f, 1.0f, 0.0f);
 
