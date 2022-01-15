@@ -21,7 +21,7 @@
 #include "camera.h"
 
 static int MARGIN = 10;
-static float EDGE_STEP = 0.8f;
+static float EDGE_STEP = 0.5f;
 
 Camera::Camera(int WindowWidth, int WindowHeight)
 {
