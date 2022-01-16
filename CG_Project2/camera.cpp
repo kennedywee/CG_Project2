@@ -203,7 +203,8 @@ void Camera::OnMouse(int x, int y)
 
 
 void Camera::OnRender()
-{
+{   
+    m_pos.y = 5.0f;
     bool ShouldUpdate = false;
 
     if (m_OnLeftEdge) {

@@ -94,7 +94,7 @@ GGProject2::GGProject2()
     spotLights[0].DiffuseIntensity = 2.5f;
     spotLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
     spotLights[0].Attenuation.Linear = 0.01f;
-    spotLights[0].Cutoff = 25.0f;
+    spotLights[0].Cutoff = 30.0f;
 
     spotLights[1].DiffuseIntensity = 0.0f;
     spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -345,10 +345,7 @@ void GGProject2::Lights(float light_d, float light_linear, Vector3f spot_color) 
     pointLights[1].Attenuation.Linear = light_linear;
     pointLights[1].Attenuation.Exp = 0.0f;
 
-    spotLights[0].DiffuseIntensity = 2.5f;
     spotLights[0].Color = spot_color;
-    spotLights[0].Attenuation.Linear = 0.01f;
-    spotLights[0].Cutoff = 25.0f;
 }
 
 
@@ -412,7 +409,7 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
         Lights(0.0001f, 0.00001f, Vector3f(1.0f, 0.0f, 0.0f));
         break;
 
-    case '0':
+    case '0': //reset
         pGameCamera->SetPosition(21.0f, 5.0f, 2.0f);
         
         startZombieGhost = false;
@@ -420,6 +417,10 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 
         startApple = false;
         appleToogle = false;
+
+        FOV = 90.0f;
+
+        Lights(0.5f, 0.01f, Vector3f(1.0f, 1.0f, 1.0f));
 
         break;
 
