@@ -1,0 +1,26 @@
+# Blender MTL File: 'reaper.blend'
+# Material Count: 2
+
+newmtl Ghost
+Ns 2.250001
+Ka 1.000000 1.000000 1.000000
+Kd 0.800000 0.800000 0.800000
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Ghost_Normal.png
+map_Kd textures\\Ghost_Base.png
+
+newmtl Ghost_Cloth_Alpha
+Ns 2.250001
+Ka 1.000000 1.000000 1.000000
+Kd 0.007629 0.006136 0.015993
+Ks 0.200000 0.200000 0.200000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Bump textures\\Ghost_Ragged_Normal.png
+map_Kd textures\\Ghost_Ragged_Base.png

@@ -16,10 +16,13 @@
 #define WINDOW_WIDTH  1920
 #define WINDOW_HEIGHT 1080
 
-bool startApple = false;
-bool startZombieGhost = false;
-bool appleToogle = false;
-bool zombieToogle = false;
+bool startBook = false;
+bool startReaper = false;
+bool startGhost = false;
+bool BookToogle = false;
+bool reaperToogle = false;
+bool ghostToogle = false;
+bool runFOV = false;
 
 
 class GGProject2
@@ -43,8 +46,8 @@ private:
     Camera* pGameCamera = NULL;
 
     BasicMesh* Room = NULL;
-    BasicMesh* Apple = NULL;
-    BasicMesh* Zombie = NULL;
+    BasicMesh* Book = NULL;
+    BasicMesh* Reaper = NULL;
     BasicMesh* Ghost = NULL;
 
     PersProjInfo persProjInfo;
@@ -55,10 +58,14 @@ private:
     float FOV = 90.f;
     float zNear = 0.01f;
     float zFar = 100.0f;
+    float runningFOV = 0.0f;
 
-    float applemoveY = 0.0f;
-    float zombiemoveX = 0.0f;
+    float bookmoveY = 0.0f;
+
+    float reaperMove = 0.0f;
+    float reaperX = 0.0f;
     float ghostmoveX = 0.0f;
+    
 };
 
 
@@ -101,12 +108,12 @@ GGProject2::~GGProject2()
         delete Room;
     }
 
-    if (Apple) {
-        delete Apple;
+    if (Book) {
+        delete Book;
     }
 
-    if (Zombie) {
-        delete Zombie;
+    if (Reaper) {
+        delete Reaper;
     }
 
     if (Ghost) {
@@ -132,13 +139,13 @@ bool GGProject2::Init()
         return false;
     }
 
-    Apple = new BasicMesh();
-    if (!Apple->LoadMesh("../Models/apple/apple.obj")) {
+    Book = new BasicMesh();
+    if (!Book->LoadMesh("../Models/book/book.obj")) {
         return false;
     }
 
-    Zombie = new BasicMesh();
-    if (!Zombie->LoadMesh("../Models/zombie/zombie.obj")) {
+    Reaper = new BasicMesh();
+    if (!Reaper->LoadMesh("../Models/reaper/reaper.obj")) {
         return false;
     }
 
@@ -205,24 +212,26 @@ void GGProject2::RenderSceneCB()
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
     Room->Render();
 
-    WorldTrans& meshWorldTransform = Apple->GetWorldTransform();
-    meshWorldTransform.SetScale(0.2f, 0.2f, 0.2f);
-    if (startApple && appleToogle) {
+    WorldTrans& meshWorldTransform = Book->GetWorldTransform();
+    meshWorldTransform.SetScale(-4.0f, 4.0f, 4.0f);
+    //meshWorldTransform.SetRotation(0.0f, 180.0f, 0.0f);
+    if (startBook && BookToogle) {
         
         static float stopY = 3.0f;
-        applemoveY += 0.005;
+        bookmoveY += 0.005;
 
-        if (applemoveY < stopY) {
-            meshWorldTransform.SetPosition(2.5f, 3.6f + applemoveY, 17.0f);
+        if (bookmoveY < stopY) {
+            meshWorldTransform.SetPosition(2.5f, 3.6f + bookmoveY, 17.0f);
+            meshWorldTransform.Rotate(1.0f, 0.0f, 0.0f);
         }
-        else if (applemoveY > stopY) {
+        else if (bookmoveY > stopY) {
             meshWorldTransform.SetPosition(2.5f, 3.6f + stopY, 17.0f);
             meshWorldTransform.Rotate(0.0f, 1.0f, 0.0f);
         }
     }
-    else if (!startApple && !appleToogle) {
-        meshWorldTransform.SetPosition(2.5f, 3.6f, 17.0f);
-        applemoveY = 0.0f;
+    else if (!startBook && !BookToogle) {
+        meshWorldTransform.SetPosition(2.5f, 3.3f, 17.0f);
+        bookmoveY = 0.0f;
     }
 
     World = meshWorldTransform.GetMatrix();
@@ -237,28 +246,48 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(Apple->GetMaterial());
+    pLightingTech->SetMaterial(Book->GetMaterial());
     CameraLocalPos3f = meshWorldTransform.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
-    Apple->Render();
+    Book->Render();
     
-    WorldTrans& meshWorldTransform2 = Zombie->GetWorldTransform();
+    WorldTrans& meshWorldTransform2 = Reaper->GetWorldTransform();
     meshWorldTransform2.SetRotation(0.0f, -90.0f, 0.0f);
-    meshWorldTransform2.SetScale(3.5f, 3.5f, 3.5f);
-    if (startZombieGhost && zombieToogle) {
-        static float stopX = 10.0f;
-        zombiemoveX += 0.01;
+    meshWorldTransform2.SetScale(2.0f, 2.0f, 2.0f);
+    if (startReaper && reaperToogle) {
+        reaperMove += 0.05f;
+        reaperX += 0.05f;
 
-        if (zombiemoveX < stopX) {
-            meshWorldTransform2.SetPosition(-10.0f + zombiemoveX, 0.0f, 4.0f);
+        if (reaperMove > 0.0f && reaperMove < 5.0f) {
+            meshWorldTransform2.SetPosition(-8.00f + reaperX, 0.0f, 4.0f);
         }
-        else if (zombiemoveX > stopX) {
-            meshWorldTransform2.SetPosition(-10.0f + stopX, 0.0f, 4.0f);
+        else if (reaperMove > 5.0f && reaperMove < 10.0f) {
+            meshWorldTransform2.SetPosition(-5.0f, 0.0f, 4.0f);
         }
+
+        else if (reaperMove > 10.0f && reaperMove < 15.0f) {
+            meshWorldTransform2.SetPosition(-8.0f, 0.0f, 13.0f);
+        }
+
+        else if (reaperMove > 20.0f && reaperMove < 30.0f) {
+            meshWorldTransform2.SetPosition(0.0f , 0.0f, 9.0f);
+            meshWorldTransform2.SetRotation(0.0f, -100.0f, 0.0f);
+            
+        }
+
+        else if (reaperMove > 30.0f) {
+            meshWorldTransform2.SetPosition(-13.5f, 0.0f, 4.0f);
+            Lights(3.0f, 0.01f, Vector3f(1.0f, 1.0f, 1.0f));
+            reaperMove = 0.0f;
+            startReaper = false;
+            reaperToogle = false;
+        }
+
+        
     }
-    else if (!startZombieGhost && !zombieToogle) {
-        meshWorldTransform2.SetPosition(-10.5f, 0.0f, 4.0f);
-        zombiemoveX = 0.0f;
+    else if (!startReaper && !reaperToogle) {
+        meshWorldTransform2.SetPosition(-13.5f, 0.0f, 4.0f);
+        reaperMove = 0.0f;
     } 
        
     World = meshWorldTransform2.GetMatrix();
@@ -273,17 +302,17 @@ void GGProject2::RenderSceneCB()
     spotLights[1].CalcLocalDirectionAndPosition(meshWorldTransform2);
     pLightingTech->SetSpotLights(2, spotLights);
 
-    pLightingTech->SetMaterial(Zombie->GetMaterial());
+    pLightingTech->SetMaterial(Reaper->GetMaterial());
     CameraLocalPos3f = meshWorldTransform2.WorldPosToLocalPos(pGameCamera->GetPos());
     pLightingTech->SetCameraLocalPos(CameraLocalPos3f);
-    Zombie->Render();
+    Reaper->Render();
 
     WorldTrans& meshWorldTransform3 = Ghost->GetWorldTransform();
     meshWorldTransform3.SetRotation(0.0f, 90.0f, 0.0f);
     meshWorldTransform3.SetScale(4.0f, 4.0f, 4.0f);
-    if (startZombieGhost && zombieToogle) {
-        static float stopX = 20.0f;
-        ghostmoveX += 0.01;
+    if (startGhost && ghostToogle && runFOV) {
+        static float stopX = 15.0f;
+        ghostmoveX += 0.5;
 
         if (ghostmoveX < stopX) {
             meshWorldTransform3.SetPosition(30.0f - ghostmoveX, 0.0f, 2.0f);
@@ -293,7 +322,7 @@ void GGProject2::RenderSceneCB()
         }
 
     }
-    else if (!startZombieGhost && !zombieToogle) {
+    else if (!startGhost && !ghostToogle && !runFOV) {
         meshWorldTransform3.SetPosition(30.0f, 0.0f, 2.0f);
         ghostmoveX = 0.0f;
     }
@@ -342,28 +371,43 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 {
     switch (key) {
     case '1':
-        if (!appleToogle) {
-            startApple = true;
-            appleToogle = true;
+        if (!BookToogle) {
+            startBook = true;
+            BookToogle = true;
         }
-        else if (appleToogle) {
-            startApple = false;
-            appleToogle = false;
+        else if (BookToogle) {
+            startBook = false;
+            BookToogle = false;
         }
         break;
 
     case '2':
-        if (!zombieToogle) {
-            startZombieGhost = true;
-            zombieToogle = true;
+        if (!reaperToogle) {
+            startReaper = true;
+            reaperToogle = true;
         }
-        else if (zombieToogle) {
-            startZombieGhost = false;
-            zombieToogle = false;
+        else if (reaperToogle) {
+            startReaper = false;
+            reaperToogle = false;
         }
+        Lights(0.5f, 0.01f, Vector3f(1.0f, 1.0f, 1.0f));
         break;
 
     case '3':
+        if (!ghostToogle) {
+            startGhost = true;
+            ghostToogle = true;
+            runFOV = true;
+        }
+        else if (ghostToogle) {
+            startGhost = false;
+            ghostToogle = false;
+            runFOV = false;
+        }
+        Lights(0.5f, 0.01f, Vector3f(1.0f, 1.0f, 1.0f));
+        break;
+
+    case '4':
         if (FOV < 45.0f) {
             FOV = 45.0f;
         }
@@ -372,7 +416,7 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
         }
         break;
 
-    case '4':
+    case '5':
         if (FOV > 90.0f) {
             FOV = 90.0f;
         }
@@ -381,7 +425,7 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
         }
         break;
 
-    case '5': // lights off
+    case '7': // lights off
         Lights(0.0001f, 0.00001f, Vector3f(1.0f, 1.0f, 1.0f));
         break;
 
@@ -389,7 +433,7 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
         Lights(3.0f, 0.01f, Vector3f(1.0f, 1.0f, 1.0f));
         break;
 
-    case '7': // lights Init
+    case '9': // lights Init
         Lights(0.5f, 0.01f, Vector3f(1.0f, 1.0f, 1.0f));
         break;
 
@@ -400,11 +444,11 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
     case '0': //reset
         pGameCamera->SetPosition(21.0f, 5.0f, 2.0f);
         
-        startZombieGhost = false;
-        zombieToogle = false;
+        startReaper = false;
+        reaperToogle = false;
 
-        startApple = false;
-        appleToogle = false;
+        startBook = false;
+        BookToogle = false;
 
         FOV = 90.0f;
 
