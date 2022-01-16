@@ -67,19 +67,7 @@ GGProject2::GGProject2()
     GLclampf Red = 0.0f, Green = 0.0f, Blue = 0.0f, Alpha = 0.0f;
     glClearColor(Red, Green, Blue, Alpha);
 
-    /*
-    glEnable(GL_CULL_FACE);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-    */
-
     glEnable(GL_DEPTH_TEST);
-
-    //float FOV = 90.0f;
-    //float zNear = 0.01f;
-    //float zFar = 100.0f;
-
-    // persProjInfo = { FOV, (float)WINDOW_WIDTH, (float)WINDOW_HEIGHT, zNear, zFar };
 
     pointLights[0].DiffuseIntensity = 0.5f;
     pointLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
@@ -94,12 +82,12 @@ GGProject2::GGProject2()
     spotLights[0].DiffuseIntensity = 2.5f;
     spotLights[0].Color = Vector3f(1.0f, 1.0f, 1.0f);
     spotLights[0].Attenuation.Linear = 0.01f;
-    spotLights[0].Cutoff = 30.0f;
+    spotLights[0].Cutoff = 25.0f;
 
     spotLights[1].DiffuseIntensity = 0.0f;
     spotLights[1].Color = Vector3f(1.0f, 1.0f, 1.0f);
     spotLights[1].Attenuation.Linear = 0.01f;
-    spotLights[1].Cutoff = 30.0f;
+    spotLights[1].Cutoff = 25.0f;
 }
 
 
@@ -466,12 +454,8 @@ void GGProject2::KeyboardCB(unsigned char key, int mouse_x, int mouse_y)
 
     }
 
-    //printf("Linear %f Exp %f\n", pointLights[0].Attenuation.Linear, pointLights[0].Attenuation.Exp);
-
     pGameCamera->OnKeyboard(key);
 
-    //printf("Key Pressed: %c\n", key);
-    //printf("FOV of startApple: %f\n", FOV);
 }
 
 
@@ -545,13 +529,10 @@ int main(int argc, char** argv)
     glutSetCursor(GLUT_CURSOR_NONE);
 
     char game_mode_string[64];
-    // Game mode string example: 2020x1080@32
-    // Enable the following three lines for full screen
     snprintf(game_mode_string, sizeof(game_mode_string), "%dx%d@62", WINDOW_WIDTH, WINDOW_HEIGHT);
     glutGameModeString(game_mode_string);
     glutEnterGameMode();
     glutFullScreen();
-
 
     // Must be done after glut is initialized!
     GLenum res = glewInit();
